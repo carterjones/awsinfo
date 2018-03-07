@@ -71,24 +71,39 @@ func extractInstanceInfo(o *ec2.DescribeInstancesOutput) []instanceInfo {
 	var info []instanceInfo
 	for _, reservation := range o.Reservations {
 		for _, instance := range reservation.Instances {
-			var name string
+			var name, publicIP, privateIP, instanceID, imageID, instanceType string
+			var launchTime time.Time
 			for _, tag := range instance.Tags {
 				if *tag.Key == "Name" {
 					name = *tag.Value
 				}
 			}
-			var publicIp string
 			if instance.PublicIpAddress != nil {
-				publicIp = *instance.PublicIpAddress
+				publicIP = *instance.PublicIpAddress
+			}
+			if instance.PrivateIpAddress != nil {
+				privateIP = *instance.PrivateIpAddress
+			}
+			if instance.InstanceId != nil {
+				instanceID = *instance.InstanceId
+			}
+			if instance.ImageId != nil {
+				imageID = *instance.ImageId
+			}
+			if instance.InstanceType != nil {
+				instanceType = *instance.InstanceType
+			}
+			if instance.LaunchTime != nil {
+				launchTime = *instance.LaunchTime
 			}
 			info = append(info, instanceInfo{
 				Name:             name,
-				ImageID:          *instance.ImageId,
-				InstanceID:       *instance.InstanceId,
-				InstanceType:     *instance.InstanceType,
-				LaunchTime:       *instance.LaunchTime,
-				PrivateIPAddress: *instance.PrivateIpAddress,
-				PublicIPAddress:  publicIp,
+				PublicIPAddress:  publicIP,
+				PrivateIPAddress: privateIP,
+				InstanceID:       instanceID,
+				ImageID:          imageID,
+				InstanceType:     instanceType,
+				LaunchTime:       launchTime,
 			})
 		}
 	}
