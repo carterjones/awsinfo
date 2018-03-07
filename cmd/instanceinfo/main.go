@@ -27,13 +27,18 @@ type instanceInfo struct {
 }
 
 func (i instanceInfo) String() string {
-	msg := fmt.Sprintf("Name:        %s\n", i.Name)
-	msg += fmt.Sprintf("AMI:         %s\n", i.ImageID)
+	var msg string
+	if i.Name != "" {
+		msg += fmt.Sprintf("Name:        %s\n", i.Name)
+	}
+	if i.PublicIPAddress != "" {
+		msg += fmt.Sprintf("Public IP:   %s\n", i.PublicIPAddress)
+	}
+	msg += fmt.Sprintf("Private IP:  %s\n", i.PrivateIPAddress)
 	msg += fmt.Sprintf("ID:          %s\n", i.InstanceID)
+	msg += fmt.Sprintf("AMI:         %s\n", i.ImageID)
 	msg += fmt.Sprintf("Type:        %s\n", i.InstanceType)
 	msg += fmt.Sprintf("Launch Time: %v\n", i.LaunchTime)
-	msg += fmt.Sprintf("Private IP:  %s\n", i.PrivateIPAddress)
-	msg += fmt.Sprintf("Public IP:   %s", i.PublicIPAddress)
 	return msg
 }
 
@@ -111,14 +116,20 @@ func main() {
 	// Extract the info we care about.
 	info := extractInstanceInfo(v)
 
+	// Find matches.
+	var matches []instanceInfo
+	for _, instance := range info {
+		if instance.Matches(searchValue) {
+			matches = append(matches, instance)
+		}
+	}
+
 	// Only print the info we care about.
-	for i, instance := range info {
+	for i, instance := range matches {
 		if i > 0 {
 			fmt.Println()
 		}
 
-		if instance.Matches(searchValue) {
-			fmt.Println(instance)
-		}
+		fmt.Print(instance)
 	}
 }
