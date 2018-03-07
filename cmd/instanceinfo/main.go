@@ -77,6 +77,10 @@ func extractInstanceInfo(o *ec2.DescribeInstancesOutput) []instanceInfo {
 					name = *tag.Value
 				}
 			}
+			var publicIp string
+			if instance.PublicIpAddress != nil {
+				publicIp = *instance.PublicIpAddress
+			}
 			info = append(info, instanceInfo{
 				Name:             name,
 				ImageID:          *instance.ImageId,
@@ -84,7 +88,7 @@ func extractInstanceInfo(o *ec2.DescribeInstancesOutput) []instanceInfo {
 				InstanceType:     *instance.InstanceType,
 				LaunchTime:       *instance.LaunchTime,
 				PrivateIPAddress: *instance.PrivateIpAddress,
-				PublicIPAddress:  *instance.PublicIpAddress,
+				PublicIPAddress:  publicIp,
 			})
 		}
 	}
