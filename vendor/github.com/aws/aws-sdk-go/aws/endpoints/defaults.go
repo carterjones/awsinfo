@@ -1715,7 +1715,11 @@ var awsPartition = partition{
 			},
 		},
 		"runtime.sagemaker": service{
-
+			Defaults: endpoint{
+				CredentialScope: credentialScope{
+					Service: "sagemaker",
+				},
+			},
 			Endpoints: endpoints{
 				"eu-west-1": endpoint{},
 				"us-east-1": endpoint{},
@@ -2877,10 +2881,6 @@ var awsusgovPartition = partition{
 				"us-gov-west-1": endpoint{
 					Hostname:  "s3.us-gov-west-1.amazonaws.com",
 					Protocols: []string{"http", "https"},
-				},
-				"us-gov-west-1-dualstack": endpoint{
-					Hostname:          "s3.dualstack.us-gov-west-1.amazonaws.com",
-					SignatureVersions: []string{"s3", "s3v4"},
 				},
 			},
 		},
