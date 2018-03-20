@@ -38,7 +38,7 @@ func (i ELBInfo) String() string {
 	var msg string
 	msg += fmt.Sprintf("Name:         %s\n", i.Name)
 	msg += fmt.Sprintf("DNS Name:     %s\n", i.DNSName)
-	msg += fmt.Sprintf("IP Addresses: %v", i.IPAddresses)
+	msg += fmt.Sprintf("IP Addresses: %v\n", i.IPAddresses)
 	return msg
 }
 

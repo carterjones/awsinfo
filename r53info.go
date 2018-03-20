@@ -21,10 +21,10 @@ func (i R53Info) String() string {
 	var msg string
 	msg += fmt.Sprintf("Name:         %s\n", i.Name)
 	msg += fmt.Sprintf("Zone:         %s\n", i.Zone)
-	msg += fmt.Sprintf("Value:        %s\n", strings.Join(i.Values, ", "))
 	if i.AliasTarget != "" {
 		msg += fmt.Sprintf("Alias Target: %s", i.AliasTarget)
 	}
+	msg += fmt.Sprintf("Value:        %s\n", strings.Join(i.Values, ", "))
 	return msg
 }
 
@@ -51,7 +51,7 @@ func (i R53Info) Matches(value string) bool {
 type R53InfoSlice []R53Info
 
 // Load gathers data from AWS about all the Route53 entries in the account.
-func (R53Infos *R53InfoSlice) Load(sess *session.Session) error {
+func (r53infos *R53InfoSlice) Load(sess *session.Session) error {
 	// Create a new route53 service handle.
 	svc := route53.New(sess)
 
@@ -88,7 +88,7 @@ func (R53Infos *R53InfoSlice) Load(sess *session.Session) error {
 					info.Values = append(info.Values, *v.Value)
 				}
 
-				*R53Infos = append(*R53Infos, info)
+				*r53infos = append(*r53infos, info)
 			}
 			return *out.IsTruncated
 		}

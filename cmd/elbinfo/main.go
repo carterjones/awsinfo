@@ -24,7 +24,8 @@ func main() {
 	panicIfErr(err)
 
 	var infos awsinfo.ELBInfoSlice
-	infos.Load(sess)
+	err = infos.Load(sess)
+	panicIfErr(err)
 
 	// Print the matches.
 	numMatches := 0
