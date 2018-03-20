@@ -35,7 +35,7 @@ func main() {
 				fmt.Println()
 			}
 
-			fmt.Println(lb)
+			fmt.Print(lb)
 			numMatches++
 		}
 	}
