@@ -5,7 +5,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
+	"github.com/pkg/errors"
 )
 
 type instanceInfo struct {
@@ -61,8 +63,17 @@ func (i instanceInfo) Matches(value string) bool {
 
 type instanceInfoSlice []instanceInfo
 
-func (info *instanceInfoSlice) Import(o *ec2.DescribeInstancesOutput) {
-	for _, reservation := range o.Reservations {
+func (info *instanceInfoSlice) Load(sess *session.Session) error {
+	// Create a new EC2 service handle.
+	svc := ec2.New(sess)
+
+	// Get information about all instances.
+	v, err := svc.DescribeInstances(nil)
+	if err != nil {
+		return errors.Wrap(err, "could not get instance info")
+	}
+
+	for _, reservation := range v.Reservations {
 		for _, instance := range reservation.Instances {
 			var name, publicIP, privateIP, instanceID, imageID, instanceType string
 			var launchTime time.Time
@@ -100,4 +111,6 @@ func (info *instanceInfoSlice) Import(o *ec2.DescribeInstancesOutput) {
 			})
 		}
 	}
+
+	return nil
 }

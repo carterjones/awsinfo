@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/ec2"
 )
 
 func main() {
@@ -23,32 +22,21 @@ func main() {
 	sess, err := session.NewSession()
 	panicIfErr(err)
 
-	// Create a new EC2 service handle.
-	svc := ec2.New(sess)
-
-	// Get information about all instances.
-	v, err := svc.DescribeInstances(nil)
+	var infos instanceInfoSlice
+	err = infos.Load(sess)
 	panicIfErr(err)
 
-	// Extract the info we care about.
-	var info instanceInfoSlice
-	info.Import(v)
-
-	// Find matches.
-	var matches []instanceInfo
-	for _, instance := range info {
-		if instance.Matches(searchValue) {
-			matches = append(matches, instance)
-		}
-	}
-
 	// Only print the info we care about.
-	for i, instance := range matches {
-		if i > 0 {
-			fmt.Println()
-		}
+	numMatches := 0
+	for _, instance := range infos {
+		if instance.Matches(searchValue) {
+			if numMatches > 0 {
+				fmt.Println()
+			}
 
-		fmt.Print(instance)
+			fmt.Print(instance)
+			numMatches++
+		}
 	}
 }
 

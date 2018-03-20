@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/elb"
 )
 
 func main() {
@@ -23,19 +22,19 @@ func main() {
 	sess, err := session.NewSession()
 	panicIfErr(err)
 
-	// Create a new EC2 service handle.
-	svc := elb.New(sess)
+	var infos elbInfoSlice
+	infos.Load(sess)
 
-	// Get information about all instances.
-	v, err := svc.DescribeLoadBalancers(nil)
-	panicIfErr(err)
-
-	var info elbInfoSlice
-	info.Import(v)
-
-	for _, lb := range info {
+	// Print the matches.
+	numMatches := 0
+	for _, lb := range infos {
 		if lb.Matches(searchValue) {
+			if numMatches > 0 {
+				fmt.Println()
+			}
+
 			fmt.Println(lb)
+			numMatches++
 		}
 	}
 }

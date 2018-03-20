@@ -6,7 +6,9 @@ import (
 	"net"
 	"strings"
 
+	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/elb"
+	"github.com/pkg/errors"
 )
 
 type elbInfo struct {
@@ -40,9 +42,18 @@ func (i elbInfo) String() string {
 
 type elbInfoSlice []elbInfo
 
-func (e *elbInfoSlice) Import(o *elb.DescribeLoadBalancersOutput) {
+func (e *elbInfoSlice) Load(sess *session.Session) error {
+	// Create a new EC2 service handle.
+	svc := elb.New(sess)
+
+	// Get information about all instances.
+	v, err := svc.DescribeLoadBalancers(nil)
+	if err != nil {
+		return errors.Wrap(err, "failed to get load balancer info")
+	}
+
 	var r net.Resolver
-	for _, lb := range o.LoadBalancerDescriptions {
+	for _, lb := range v.LoadBalancerDescriptions {
 		var dnsName, name string
 		if lb.DNSName != nil {
 			dnsName = *lb.DNSName
@@ -59,4 +70,6 @@ func (e *elbInfoSlice) Import(o *elb.DescribeLoadBalancersOutput) {
 			IPAddresses: addrs,
 		})
 	}
+
+	return nil
 }
