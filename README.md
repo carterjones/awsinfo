@@ -6,13 +6,23 @@ $ go get -u github.com/carterjones/awsinfo/...
 
 ## usage
 
+### awsinfo
+
+```bash
+$ awsinfo <search-term>
+```
+
+This tool performs a search that effectively combines the rest of the tools into
+a single command.
+
 ### instanceinfo
 
 ```bash
 $ instanceinfo <search-term>
 ```
 
-This tool searches against the following pieces of information found on each AWS instance.
+This tool searches against the following pieces of information found on each AWS
+instance.
 
 - Image ID
 - Instance ID
@@ -30,7 +40,8 @@ When any matches are found, instance information is printed.
 $ elbinfo <search-term>
 ```
 
-This tool searches against the following pieces of information found on each classic ELB.
+This tool searches against the following pieces of information found on each
+classic ELB.
 
 - Name
 - DNS name
