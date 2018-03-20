@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/carterjones/awsinfo"
 )
 
 func main() {
@@ -23,7 +24,7 @@ func main() {
 	panicIfErr(err)
 
 	// Load the route53 info.
-	var infos r53infoSlice
+	var infos awsinfo.R53InfoSlice
 	err = infos.Load(sess)
 	panicIfErr(err)
 

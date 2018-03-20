@@ -1,4 +1,4 @@
-package main
+package awsinfo
 
 import (
 	"fmt"
@@ -9,14 +9,15 @@ import (
 	"github.com/pkg/errors"
 )
 
-type r53info struct {
+// R53Info contains minimal data about a Route53 entry.
+type R53Info struct {
 	Zone        string
 	Name        string
 	Values      []string
 	AliasTarget string
 }
 
-func (i r53info) String() string {
+func (i R53Info) String() string {
 	var msg string
 	msg += fmt.Sprintf("Name:         %s\n", i.Name)
 	msg += fmt.Sprintf("Zone:         %s\n", i.Zone)
@@ -27,7 +28,8 @@ func (i r53info) String() string {
 	return msg
 }
 
-func (i r53info) Matches(value string) bool {
+// Matches determines if a value can be found in the data for the Route53 entry.
+func (i R53Info) Matches(value string) bool {
 	if strings.Contains(i.Name, value) {
 		return true
 	}
@@ -45,9 +47,11 @@ func (i r53info) Matches(value string) bool {
 	return false
 }
 
-type r53infoSlice []r53info
+// R53InfoSlice is a slice of R53Info objects.
+type R53InfoSlice []R53Info
 
-func (r53infos *r53infoSlice) Load(sess *session.Session) error {
+// Load gathers data from AWS about all the Route53 entries in the account.
+func (R53Infos *R53InfoSlice) Load(sess *session.Session) error {
 	// Create a new route53 service handle.
 	svc := route53.New(sess)
 
@@ -70,7 +74,7 @@ func (r53infos *r53infoSlice) Load(sess *session.Session) error {
 		handleRecords := func(out *route53.ListResourceRecordSetsOutput, ok bool) bool {
 			for _, rs := range out.ResourceRecordSets {
 				zoneID := strings.Replace(*zone.Id, "/hostedzone/", "", -1)
-				info := r53info{
+				info := R53Info{
 					Zone: *zone.Name + " (" + zoneID + ")",
 					Name: *rs.Name,
 				}
@@ -84,7 +88,7 @@ func (r53infos *r53infoSlice) Load(sess *session.Session) error {
 					info.Values = append(info.Values, *v.Value)
 				}
 
-				*r53infos = append(*r53infos, info)
+				*R53Infos = append(*R53Infos, info)
 			}
 			return *out.IsTruncated
 		}

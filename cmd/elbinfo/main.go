@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/carterjones/awsinfo"
 )
 
 func main() {
@@ -22,7 +23,7 @@ func main() {
 	sess, err := session.NewSession()
 	panicIfErr(err)
 
-	var infos elbInfoSlice
+	var infos awsinfo.ELBInfoSlice
 	infos.Load(sess)
 
 	// Print the matches.
