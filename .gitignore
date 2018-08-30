@@ -1,3 +1,1 @@
-cmd/instanceinfo/instanceinfo
-cmd/elbinfo/elbinfo
-cmd/r53info/r53info
+bin
