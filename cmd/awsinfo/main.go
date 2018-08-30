@@ -6,7 +6,9 @@ import (
 	"reflect"
 
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/carterjones/awsinfo"
+	"github.com/carterjones/awsinfo/info/elb"
+	"github.com/carterjones/awsinfo/info/instance"
+	"github.com/carterjones/awsinfo/info/r53"
 )
 
 type matcher interface {
@@ -33,9 +35,9 @@ func main() {
 	panicIfErr(err)
 
 	var loaders = []loader{
-		&awsinfo.InstanceInfoSlice{},
-		&awsinfo.ELBInfoSlice{},
-		&awsinfo.R53InfoSlice{},
+		&instance.InfoSlice{},
+		&elb.InfoSlice{},
+		&r53.InfoSlice{},
 	}
 
 	for _, l := range loaders {
@@ -50,20 +52,20 @@ func main() {
 		}
 		var matchers []matcher
 		switch l.(type) {
-		case *awsinfo.InstanceInfoSlice:
-			infos := l.(*awsinfo.InstanceInfoSlice)
+		case *instance.InfoSlice:
+			infos := l.(*instance.InfoSlice)
 			for _, i := range *infos {
 				matchers = append(matchers, i)
 			}
 			fmt.Println("Instances:")
-		case *awsinfo.ELBInfoSlice:
-			infos := l.(*awsinfo.ELBInfoSlice)
+		case *elb.InfoSlice:
+			infos := l.(*elb.InfoSlice)
 			for _, i := range *infos {
 				matchers = append(matchers, i)
 			}
 			fmt.Println("ELBs:")
-		case *awsinfo.R53InfoSlice:
-			infos := l.(*awsinfo.R53InfoSlice)
+		case *r53.InfoSlice:
+			infos := l.(*r53.InfoSlice)
 			for _, i := range *infos {
 				matchers = append(matchers, i)
 			}

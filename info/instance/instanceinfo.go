@@ -1,4 +1,4 @@
-package awsinfo
+package instance
 
 import (
 	"fmt"
@@ -10,8 +10,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-// InstanceInfo contains a minimal set of information about an EC2 instance.
-type InstanceInfo struct {
+// Info contains a minimal set of information about an EC2 instance.
+type Info struct {
 	ImageID          string
 	InstanceID       string
 	InstanceType     string
@@ -21,7 +21,7 @@ type InstanceInfo struct {
 	Name             string
 }
 
-func (i InstanceInfo) String() string {
+func (i Info) String() string {
 	var msg string
 	if i.Name != "" {
 		msg += fmt.Sprintf("Name:        %s\n", i.Name)
@@ -38,7 +38,7 @@ func (i InstanceInfo) String() string {
 }
 
 // Matches determines if a value can be found in the data for the EC2 instance.
-func (i InstanceInfo) Matches(value string) bool {
+func (i Info) Matches(value string) bool {
 	if strings.Contains(i.Name, value) {
 		return true
 	}
@@ -63,11 +63,11 @@ func (i InstanceInfo) Matches(value string) bool {
 	return false
 }
 
-// InstanceInfoSlice is a slice of InstanceInfo objects.
-type InstanceInfoSlice []InstanceInfo
+// InfoSlice is a slice of Info objects.
+type InfoSlice []Info
 
 // Load gathers data from AWS about all the EC2 instances in the account.
-func (info *InstanceInfoSlice) Load(sess *session.Session) error {
+func (info *InfoSlice) Load(sess *session.Session) error {
 	// Create a new EC2 service handle.
 	svc := ec2.New(sess)
 
@@ -104,7 +104,7 @@ func (info *InstanceInfoSlice) Load(sess *session.Session) error {
 			if instance.LaunchTime != nil {
 				launchTime = *instance.LaunchTime
 			}
-			*info = append(*info, InstanceInfo{
+			*info = append(*info, Info{
 				Name:             name,
 				PublicIPAddress:  publicIP,
 				PrivateIPAddress: privateIP,

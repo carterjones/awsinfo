@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/carterjones/awsinfo"
+	"github.com/carterjones/awsinfo/info/elb"
 )
 
 func main() {
@@ -23,19 +23,19 @@ func main() {
 	sess, err := session.NewSession()
 	panicIfErr(err)
 
-	var infos awsinfo.ELBInfoSlice
+	var infos elb.InfoSlice
 	err = infos.Load(sess)
 	panicIfErr(err)
 
 	// Print the matches.
 	numMatches := 0
-	for _, lb := range infos {
-		if lb.Matches(searchValue) {
+	for _, v := range infos {
+		if v.Matches(searchValue) {
 			if numMatches > 0 {
 				fmt.Println()
 			}
 
-			fmt.Print(lb)
+			fmt.Print(v)
 			numMatches++
 		}
 	}

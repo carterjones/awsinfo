@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/carterjones/awsinfo"
+	"github.com/carterjones/awsinfo/info/r53"
 )
 
 func main() {
@@ -24,19 +24,19 @@ func main() {
 	panicIfErr(err)
 
 	// Load the route53 info.
-	var infos awsinfo.R53InfoSlice
+	var infos r53.InfoSlice
 	err = infos.Load(sess)
 	panicIfErr(err)
 
 	// Print the matches.
 	numMatches := 0
-	for _, info := range infos {
-		if info.Matches(searchValue) {
+	for _, v := range infos {
+		if v.Matches(searchValue) {
 			if numMatches > 0 {
 				fmt.Println()
 			}
 
-			fmt.Print(info.String())
+			fmt.Print(v.String())
 			numMatches++
 		}
 	}

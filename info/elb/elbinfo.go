@@ -1,4 +1,4 @@
-package awsinfo
+package elb
 
 import (
 	"context"
@@ -11,15 +11,15 @@ import (
 	"github.com/pkg/errors"
 )
 
-// ELBInfo contains a minimal amount of information about a classic ELB.
-type ELBInfo struct {
+// Info contains a minimal amount of information about a classic ELB.
+type Info struct {
 	Name        string
 	DNSName     string
 	IPAddresses []string
 }
 
 // Matches determines if a value can be found in the data for the ELB.
-func (i ELBInfo) Matches(value string) bool {
+func (i Info) Matches(value string) bool {
 	if strings.Contains(i.Name, value) {
 		return true
 	}
@@ -34,7 +34,7 @@ func (i ELBInfo) Matches(value string) bool {
 	return false
 }
 
-func (i ELBInfo) String() string {
+func (i Info) String() string {
 	var msg string
 	msg += fmt.Sprintf("Name:         %s\n", i.Name)
 	msg += fmt.Sprintf("DNS Name:     %s\n", i.DNSName)
@@ -42,11 +42,11 @@ func (i ELBInfo) String() string {
 	return msg
 }
 
-// ELBInfoSlice is a slice of ELBInfo objects.
-type ELBInfoSlice []ELBInfo
+// InfoSlice is a slice of Info objects.
+type InfoSlice []Info
 
 // Load gathers data from AWS about all the classic ELBs in the account.
-func (e *ELBInfoSlice) Load(sess *session.Session) error {
+func (e *InfoSlice) Load(sess *session.Session) error {
 	// Create a new EC2 service handle.
 	svc := elb.New(sess)
 
@@ -70,7 +70,7 @@ func (e *ELBInfoSlice) Load(sess *session.Session) error {
 			return errors.Wrapf(err, "failed to look up host: %v", dnsName)
 		}
 
-		*e = append(*e, ELBInfo{
+		*e = append(*e, Info{
 			DNSName:     dnsName,
 			Name:        name,
 			IPAddresses: addrs,

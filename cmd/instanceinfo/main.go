@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/carterjones/awsinfo"
+	"github.com/carterjones/awsinfo/info/instance"
 )
 
 func main() {
@@ -23,19 +23,19 @@ func main() {
 	sess, err := session.NewSession()
 	panicIfErr(err)
 
-	var infos awsinfo.InstanceInfoSlice
+	var infos instance.InfoSlice
 	err = infos.Load(sess)
 	panicIfErr(err)
 
 	// Only print the info we care about.
 	numMatches := 0
-	for _, instance := range infos {
-		if instance.Matches(searchValue) {
+	for _, v := range infos {
+		if v.Matches(searchValue) {
 			if numMatches > 0 {
 				fmt.Println()
 			}
 
-			fmt.Print(instance)
+			fmt.Print(v)
 			numMatches++
 		}
 	}
