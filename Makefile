@@ -1,6 +1,3 @@
-GO111MODULE := on
-unexport GOPATH
-
 build-native:
 	go build -mod=vendor -o bin/awsinfo ./cmd/awsinfo/
 	go build -mod=vendor -o bin/elbinfo ./cmd/elbinfo/
@@ -8,7 +5,7 @@ build-native:
 	go build -mod=vendor -o bin/r53info ./cmd/r53info/
 
 build-linux:
-	docker run -v $(PWD):/go/src/github.com/carterjones/awsinfo golang:1.11 /bin/bash -c "cd /go/src/github.com/carterjones/awsinfo && make"
+	docker run -v $(PWD):/go/src/github.com/carterjones/awsinfo golang:1.14 /bin/bash -c "cd /go/src/github.com/carterjones/awsinfo && make"
 
 clean:
 	rm -rf ./bin/
