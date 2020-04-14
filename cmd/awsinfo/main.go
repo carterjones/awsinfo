@@ -21,7 +21,7 @@ type loader interface {
 
 func main() {
 	if len(os.Args) != 2 {
-		fmt.Println("usage: elbinfo <search-value>")
+		fmt.Println("usage: awsinfo <search-value>")
 		os.Exit(1)
 	}
 
