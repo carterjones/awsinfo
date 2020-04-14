@@ -1,5 +1,14 @@
 ## installation
 
+Homebrew:
+
+```bash
+brew tap carterjones/awsinfo
+brew install awsinfo
+```
+
+Universal:
+
 ```bash
 $ go get -u github.com/carterjones/awsinfo/...
 ```
