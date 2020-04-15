@@ -63,6 +63,19 @@ func (i Info) Matches(value string) bool {
 	return false
 }
 
+// IPs only returns information about IP addresses.
+func (i Info) IPs() string {
+	var msg string
+	if i.Name != "" {
+		msg += fmt.Sprintf("Name:        %s\n", i.Name)
+	}
+	if i.PublicIPAddress != "" {
+		msg += fmt.Sprintf("Public IP:   %s\n", i.PublicIPAddress)
+	}
+	msg += fmt.Sprintf("Private IP:  %s\n", i.PrivateIPAddress)
+	return msg
+}
+
 // InfoSlice is a slice of Info objects.
 type InfoSlice []Info
 

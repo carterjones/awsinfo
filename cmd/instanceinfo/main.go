@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 
@@ -8,13 +9,21 @@ import (
 	"github.com/carterjones/awsinfo/info/instance"
 )
 
+func usage() {
+	fmt.Println("usage: [-ips] instanceinfo <search-value>")
+	os.Exit(1)
+}
+
 func main() {
-	if len(os.Args) != 2 {
-		fmt.Println("usage: instanceinfo <search-value>")
-		os.Exit(1)
+	ipsPtr := flag.Bool("ips", false, "only print information about IPs")
+	flag.Parse()
+
+	args := flag.Args()
+	if len(args) != 1 {
+		usage()
 	}
 
-	searchValue := os.Args[1]
+	searchValue := args[0]
 
 	// Tell the SDK to load defaults from your ~/.aws/config file.
 	os.Setenv("AWS_SDK_LOAD_CONFIG", "true")
@@ -35,7 +44,11 @@ func main() {
 				fmt.Println()
 			}
 
-			fmt.Print(v)
+			if *ipsPtr {
+				fmt.Print(v.IPs())
+			} else {
+				fmt.Print(v)
+			}
 			numMatches++
 		}
 	}
