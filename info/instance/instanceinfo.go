@@ -94,6 +94,10 @@ func (info *InfoSlice) Load(sess *session.Session) error {
 		for _, instance := range reservation.Instances {
 			var name, publicIP, privateIP, instanceID, imageID, instanceType string
 			var launchTime time.Time
+			if *instance.State.Name != "running" {
+				// Ignore all instances that are not running.
+				continue
+			}
 			for _, tag := range instance.Tags {
 				if *tag.Key == "Name" {
 					name = *tag.Value
