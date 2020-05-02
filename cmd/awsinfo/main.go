@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"reflect"
@@ -11,8 +12,9 @@ import (
 	"github.com/carterjones/awsinfo/info/r53"
 )
 
-type matcher interface {
+type matchIPInfoer interface {
 	Matches(string) bool
+	IPInfo() string
 }
 
 type loader interface {
@@ -20,12 +22,16 @@ type loader interface {
 }
 
 func main() {
-	if len(os.Args) != 2 {
-		fmt.Println("usage: awsinfo <search-value>")
+	onlyIPInfo := flag.Bool("ips", false, "if true, only show IP address information")
+	flag.Parse()
+	tail := flag.Args()
+
+	if len(tail) != 1 {
+		fmt.Println("usage: awsinfo [-ips] <search-value>")
 		os.Exit(1)
 	}
 
-	searchValue := os.Args[1]
+	searchValue := tail[0]
 
 	// Tell the SDK to load defaults from your ~/.aws/config file.
 	os.Setenv("AWS_SDK_LOAD_CONFIG", "true")
@@ -50,39 +56,58 @@ func main() {
 		if i > 0 {
 			fmt.Println()
 		}
-		var matchers []matcher
+		var matchIPInfoers []matchIPInfoer
 		switch l.(type) {
 		case *instance.InfoSlice:
 			infos := l.(*instance.InfoSlice)
+			if len(*infos) == 0 {
+				continue
+			}
 			for _, i := range *infos {
-				matchers = append(matchers, i)
+				matchIPInfoers = append(matchIPInfoers, i)
 			}
 			fmt.Println("Instances:")
 		case *elb.InfoSlice:
 			infos := l.(*elb.InfoSlice)
+			if len(*infos) == 0 {
+				continue
+			}
 			for _, i := range *infos {
-				matchers = append(matchers, i)
+				matchIPInfoers = append(matchIPInfoers, i)
 			}
 			fmt.Println("ELBs:")
 		case *r53.InfoSlice:
 			infos := l.(*r53.InfoSlice)
+			if len(*infos) == 0 {
+				continue
+			}
 			for _, i := range *infos {
-				matchers = append(matchers, i)
+				matchIPInfoers = append(matchIPInfoers, i)
 			}
 			fmt.Println("Route53 entries:")
 		default:
 			panic("invalid type detected: " + reflect.TypeOf(l).String())
 		}
 
-		numMatches := 0
-		for _, m := range matchers {
-			if m.Matches(searchValue) {
-				if numMatches > 0 {
+		justPrintedSomething := false
+		for _, v := range matchIPInfoers {
+			if v.Matches(searchValue) {
+				if justPrintedSomething {
 					fmt.Println()
 				}
 
-				fmt.Print(m)
-				numMatches++
+				if *onlyIPInfo {
+					msg := v.IPInfo()
+					if msg != "" {
+						fmt.Print(msg)
+						justPrintedSomething = true
+					} else {
+						justPrintedSomething = false
+					}
+				} else {
+					fmt.Print(v)
+					justPrintedSomething = true
+				}
 			}
 		}
 	}

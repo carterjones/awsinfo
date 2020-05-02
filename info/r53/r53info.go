@@ -2,6 +2,7 @@ package r53
 
 import (
 	"fmt"
+	"net"
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -15,6 +16,25 @@ type Info struct {
 	Name        string
 	Values      []string
 	AliasTarget string
+}
+
+// IPInfo returns only information related to IP addresses.
+func (i Info) IPInfo() string {
+	var msg string
+	msg += fmt.Sprintf("Name:         %s\n", i.Name)
+	valuesHaveIPs := false
+	for _, v := range i.Values {
+		if net.ParseIP(v) != nil {
+			valuesHaveIPs = true
+			break
+		}
+	}
+	if valuesHaveIPs {
+		msg += fmt.Sprintf("Value:        %s\n", strings.Join(i.Values, ", "))
+		return msg
+	}
+
+	return ""
 }
 
 func (i Info) String() string {

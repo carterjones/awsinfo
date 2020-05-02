@@ -15,15 +15,15 @@ func usage() {
 }
 
 func main() {
-	ipsPtr := flag.Bool("ips", false, "only print information about IPs")
+	onlyIPInfo := flag.Bool("ips", false, "only print information about IPs")
 	flag.Parse()
 
-	args := flag.Args()
-	if len(args) != 1 {
+	tail := flag.Args()
+	if len(tail) != 1 {
 		usage()
 	}
 
-	searchValue := args[0]
+	searchValue := tail[0]
 
 	// Tell the SDK to load defaults from your ~/.aws/config file.
 	os.Setenv("AWS_SDK_LOAD_CONFIG", "true")
@@ -37,19 +37,25 @@ func main() {
 	panicIfErr(err)
 
 	// Only print the info we care about.
-	numMatches := 0
+	justPrintedSomething := false
 	for _, v := range infos {
 		if v.Matches(searchValue) {
-			if numMatches > 0 {
+			if justPrintedSomething {
 				fmt.Println()
 			}
 
-			if *ipsPtr {
-				fmt.Print(v.IPs())
+			if *onlyIPInfo {
+				msg := v.IPInfo()
+				if msg != "" {
+					fmt.Print(msg)
+					justPrintedSomething = true
+				} else {
+					justPrintedSomething = false
+				}
 			} else {
 				fmt.Print(v)
+				justPrintedSomething = true
 			}
-			numMatches++
 		}
 	}
 }

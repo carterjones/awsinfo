@@ -34,6 +34,14 @@ func (i Info) Matches(value string) bool {
 	return false
 }
 
+// IPInfo returns only information related to IP addresses.
+func (i Info) IPInfo() string {
+	var msg string
+	msg += fmt.Sprintf("Name:         %s\n", i.Name)
+	msg += fmt.Sprintf("IP Addresses: %v\n", i.IPAddresses)
+	return msg
+}
+
 func (i Info) String() string {
 	var msg string
 	msg += fmt.Sprintf("Name:         %s\n", i.Name)

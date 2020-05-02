@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 
@@ -9,12 +10,16 @@ import (
 )
 
 func main() {
-	if len(os.Args) != 2 {
-		fmt.Println("usage: elbinfo <search-value>")
+	onlyIPInfo := flag.Bool("ips", false, "if true, only show IP address information")
+	flag.Parse()
+	tail := flag.Args()
+
+	if len(tail) != 1 {
+		fmt.Println("usage: elbinfo [-ips] <search-value>")
 		os.Exit(1)
 	}
 
-	searchValue := os.Args[1]
+	searchValue := tail[0]
 
 	// Tell the SDK to load defaults from your ~/.aws/config file.
 	os.Setenv("AWS_SDK_LOAD_CONFIG", "true")
@@ -28,15 +33,25 @@ func main() {
 	panicIfErr(err)
 
 	// Print the matches.
-	numMatches := 0
+	justPrintedSomething := false
 	for _, v := range infos {
 		if v.Matches(searchValue) {
-			if numMatches > 0 {
+			if justPrintedSomething {
 				fmt.Println()
 			}
 
-			fmt.Print(v)
-			numMatches++
+			if *onlyIPInfo {
+				msg := v.IPInfo()
+				if msg != "" {
+					fmt.Print(msg)
+					justPrintedSomething = true
+				} else {
+					justPrintedSomething = false
+				}
+			} else {
+				fmt.Print(v)
+				justPrintedSomething = true
+			}
 		}
 	}
 }
